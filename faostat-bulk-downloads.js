@@ -28,6 +28,61 @@ define(['jquery',
         /* Fix the language, if needed. */
         this.CONFIG.lang = this.CONFIG.lang != null ? this.CONFIG.lang : 'E';
 
+    };
+
+    BULK.prototype.create_flat_list = function() {
+
+        /* this... */
+        var _this = this;
+
+        /* Bulk downloads service URL. */
+        var url = this.CONFIG.bulks_url + '/' + this.CONFIG.datasource + '/' + this.CONFIG.domain + '/' + this.CONFIG.lang;
+
+        $.ajax({
+
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+
+            success: function (response) {
+
+                /* Cast the result, if required. */
+                var json = response;
+                if (typeof json == 'string')
+                    json = $.parseJSON(response);
+
+                /* Create flat list. */
+                var s = '<ul>';
+                var source = $(templates).filter('#dropdown_item').html();
+                var template = Handlebars.compile(source);
+                for (var i = 0 ; i < json.length ; i++) {
+                    var dynamic_data = {
+                        item_url: _this.CONFIG.bulks_root + json[i][2],
+                        item_text: json[i][3].replace(/\_/g,' ')
+                    };
+                    s += template(dynamic_data);
+                }
+                s += '</ul>';
+
+                /* Render the list. */
+                $('#' + _this.CONFIG.placeholder_id).html(s);
+
+            },
+
+            error: function (a, b, c) {
+                swal({
+                    title: translate.error,
+                    type: 'error',
+                    text: a
+                });
+            }
+
+        });
+
+    };
+
+    BULK.prototype.create_drop_down_button = function() {
+
         /* this... */
         var _this = this;
 
