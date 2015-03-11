@@ -3,7 +3,7 @@ define(['jquery',
         'text!faostat_bulk_downloads/html/templates.html',
         'i18n!faostat_bulk_downloads/nls/translate',
         'bootstrap',
-        'sweet-alert'], function ($, Handlebars, templates, translate) {
+        'sweetAlert'], function ($, Handlebars, templates, translate) {
 
     'use strict';
 
