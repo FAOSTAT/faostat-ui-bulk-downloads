@@ -1,4 +1,4 @@
-<template id='dropdown_button'>
+<script type='text/x-handlebars-template' id='dropdown_button'>
     <div class='btn-group'>
         <button type='button' class='btn btn-default dropdown-toggle' data-toggle='dropdown' aria-expanded='false'>
             <i class='fa fa-archive'></i> {{button_label}}
@@ -6,12 +6,12 @@
         <ul class='dropdown-menu' role='menu' id='item_list'>
         </ul>
     </div>
-</template>
+</script>
 
-<template id='dropdown_item'>
+<script type='text/x-handlebars-template' id='dropdown_item'>
     <li>
         <a  target='_blank' href='{{item_url}}'>
             <i class='fa fa-archive'></i> {{item_text}}
         </a>
     </li>
-</template>
+</script>
