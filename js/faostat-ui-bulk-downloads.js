@@ -1,7 +1,7 @@
 define(['jquery',
         'handlebars',
-        'text!faostat_bulk_downloads/html/templates.html',
-        'i18n!faostat_bulk_downloads/nls/translate',
+        'text!faostat_ui_bulk_downloads/html/templates.html',
+        'i18n!faostat_ui_bulk_downloads/nls/translate',
         'bootstrap',
         'sweetAlert'], function ($, Handlebars, templates, translate) {
 
