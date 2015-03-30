@@ -52,17 +52,20 @@ define(['jquery',
                     json = $.parseJSON(response);
 
                 /* Create flat list. */
-                var s = '<ul>';
+                var s = '';
                 var source = $(templates).filter('#dropdown_item').html();
                 var template = Handlebars.compile(source);
                 for (var i = 0 ; i < json.length ; i++) {
+                    var name = json[i][3].replace(/\_/g,' ');
+                    name = name.substring(0, name.indexOf('('));
+                    var size = json[i][3].substr(json[i][3].indexOf('('), json[i][3].indexOf(')'));
                     var dynamic_data = {
                         item_url: _this.CONFIG.bulks_root + json[i][2],
-                        item_text: json[i][3].replace(/\_/g,' ')
+                        item_text: name,
+                        item_size: size
                     };
                     s += template(dynamic_data);
                 }
-                s += '</ul>';
 
                 /* Render the list. */
                 $('#' + _this.CONFIG.placeholder_id).html(s);
