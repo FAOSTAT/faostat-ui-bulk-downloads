@@ -1,9 +1,10 @@
 define(['jquery',
         'handlebars',
+        'FAOSTAT_UI_COMMONS',
         'text!faostat_ui_bulk_downloads/html/templates.html',
         'i18n!faostat_ui_bulk_downloads/nls/translate',
         'bootstrap',
-        'sweetAlert'], function ($, Handlebars, templates, translate) {
+        'sweetAlert'], function ($, Handlebars, Commons, templates, translate) {
 
     'use strict';
 
@@ -11,11 +12,12 @@ define(['jquery',
 
         this.CONFIG = {
             lang: 'E',
-            placeholder_id: 'placeholder',
+            domain: null,
+            lang_faostat: 'E',
             datasource: 'faostat',
-            bulks_url: 'http://faostat3.fao.org/wds/rest/bulkdownloads',
-            bulks_root: 'http://faostat.fao.org/Portals/_Faostat/Downloads/zip_files/',
-            domain: null
+            placeholder_id: 'placeholder',
+            url_bulk_downloads: 'http://faostat3.fao.org/wds/rest/bulkdownloads',
+            bulk_downloads_root: 'http://faostat.fao.org/Portals/_Faostat/Downloads/zip_files/'
         };
 
     }
@@ -28,6 +30,9 @@ define(['jquery',
         /* Fix the language, if needed. */
         this.CONFIG.lang = this.CONFIG.lang != null ? this.CONFIG.lang : 'E';
 
+        /* Store FAOSTAT language. */
+        this.CONFIG.lang_faostat = Commons.iso2faostat(this.CONFIG.lang);
+
     };
 
     BULK.prototype.create_flat_list = function() {
@@ -36,7 +41,7 @@ define(['jquery',
         var _this = this;
 
         /* Bulk downloads service URL. */
-        var url = this.CONFIG.bulks_url + '/' + this.CONFIG.datasource + '/' + this.CONFIG.domain + '/' + this.CONFIG.lang;
+        var url = this.CONFIG.url_bulk_downloads + '/' + this.CONFIG.datasource + '/' + this.CONFIG.domain + '/' + this.CONFIG.lang;
 
         $.ajax({
 
@@ -60,7 +65,7 @@ define(['jquery',
                     name = name.substring(0, name.indexOf('('));
                     var size = json[i][3].substr(json[i][3].indexOf('('), json[i][3].indexOf(')'));
                     var dynamic_data = {
-                        item_url: _this.CONFIG.bulks_root + json[i][2],
+                        item_url: _this.CONFIG.bulk_downloads_root + json[i][2],
                         item_text: name,
                         item_size: size
                     };
@@ -90,7 +95,7 @@ define(['jquery',
         var _this = this;
 
         /* Bulk downloads service URL. */
-        var url = this.CONFIG.bulks_url + '/' + this.CONFIG.datasource + '/' + this.CONFIG.domain + '/' + this.CONFIG.lang;
+        var url = this.CONFIG.url_bulk_downloads + '/' + this.CONFIG.datasource + '/' + this.CONFIG.domain + '/' + this.CONFIG.lang;
 
         $.ajax({
 
@@ -120,7 +125,7 @@ define(['jquery',
                 template = Handlebars.compile(source);
                 for (var i = 0 ; i < json.length ; i++) {
                     dynamic_data = {
-                        item_url: _this.CONFIG.bulks_root + json[i][2],
+                        item_url: _this.CONFIG.bulk_downloads_root + json[i][2],
                         item_text: json[i][3].replace(/\_/g,' ')
                     };
                     s += template(dynamic_data);
