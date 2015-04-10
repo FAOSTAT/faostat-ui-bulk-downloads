@@ -3,6 +3,6 @@ define({
         error: 'Error',
         button_label: 'Bulk Downloads'
     },
-    F : true,
-    S : true
+    fr : true,
+    es : true
 });
