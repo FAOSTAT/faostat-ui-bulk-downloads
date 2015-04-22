@@ -16,7 +16,7 @@ define(['jquery',
             lang_faostat: 'E',
             datasource: 'faostat',
             placeholder_id: 'placeholder',
-            url_bulk_downloads: 'http://faostat3.fao.org/wds/rest/bulkdownloads',
+            url_bulk_downloads: 'http://faostat3.fao.org/wds/rest',
             bulk_downloads_root: 'http://faostat.fao.org/Portals/_Faostat/Downloads/zip_files/'
         };
 
@@ -62,7 +62,7 @@ define(['jquery',
             /* Render the list. */
             $('#' + _this.CONFIG.placeholder_id).html(s);
 
-        });
+        }, this.CONFIG.url_bulk_downloads);
 
     };
 
