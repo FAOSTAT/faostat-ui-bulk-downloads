@@ -1,10 +1,10 @@
 define(['jquery',
         'handlebars',
-        'FAOSTAT_UI_COMMONS',
-        'text!faostat_ui_bulk_downloads/html/templates.html',
-        'i18n!faostat_ui_bulk_downloads/nls/translate',
+        'text!faostat_ui_bulk_downloads/html/templates.hbs',
+        'faostat_commons',
+        'wds_client',
         'bootstrap',
-        'sweetAlert'], function ($, Handlebars, Commons, templates, translate) {
+        'sweetAlert'], function ($, Handlebars, templates, FAOSTATCommons, WDSClient) {
 
     'use strict';
 
@@ -17,7 +17,8 @@ define(['jquery',
             datasource: 'faostat',
             placeholder_id: 'placeholder',
             url_bulk_downloads: 'http://faostat3.fao.org/wds/rest',
-            bulk_downloads_root: 'http://faostat.fao.org/Portals/_Faostat/Downloads/zip_files/'
+            bulk_downloads_root: 'http://faostat.fao.org/Portals/_Faostat/Downloads/zip_files/',
+            url_wds_crud: 'http://fenixapps2.fao.org/wds_5.1/rest/crud'
         };
 
     }
@@ -31,7 +32,7 @@ define(['jquery',
         this.CONFIG.lang = this.CONFIG.lang != null ? this.CONFIG.lang : 'E';
 
         /* Store FAOSTAT language. */
-        this.CONFIG.lang_faostat = Commons.iso2faostat(this.CONFIG.lang);
+        this.CONFIG.lang_faostat = FAOSTATCommons.iso2faostat(this.CONFIG.lang);
 
     };
 
@@ -40,8 +41,14 @@ define(['jquery',
         /* this... */
         var _this = this;
 
+        /* Initiate the WDS client. */
+        var w = new WDSClient({
+            datasource: this.CONFIG.datasource,
+            serviceUrl: this.CONFIG.url_wds_crud
+        });
+
         /* Fetch available bulk downloads. */
-        Commons.wdsclient('bulkdownloads', this.CONFIG, function(json) {
+        w.wdsclient('bulkdownloads', this.CONFIG, function(json) {
 
             /* Create flat list. */
             var s = '';
@@ -50,7 +57,7 @@ define(['jquery',
             for (var i = 0 ; i < json.length ; i++) {
                 var name = json[i][3].replace(/\_/g,' ');
                 name = name.substring(0, name.indexOf('('));
-                var size = json[i][3].substr(json[i][3].indexOf('('), json[i][3].indexOf(')'));
+                var size = json[i][3].substring(1 + json[i][3].lastIndexOf('('), json[i][3].length - 1);
                 var dynamic_data = {
                     item_url: _this.CONFIG.bulk_downloads_root + json[i][2],
                     item_text: name,
@@ -63,42 +70,6 @@ define(['jquery',
             $('#' + _this.CONFIG.placeholder_id).html(s);
 
         }, this.CONFIG.url_bulk_downloads);
-
-    };
-
-    BULK.prototype.create_drop_down_button = function() {
-
-        /* this... */
-        var _this = this;
-
-        /* Fetch available bulk downloads. */
-        Commons.wdsclient('bulkdownloads', this.CONFIG, function(json) {
-
-            /* Load button template. */
-            var source = $(templates).filter('#dropdown_button').html();
-            var template = Handlebars.compile(source);
-            var dynamic_data = {
-                button_label: translate.button_label
-            };
-            var html = template(dynamic_data);
-            $('#' + _this.CONFIG.placeholder_id).html(html);
-
-            /* Create entries for the item list. */
-            var s = '';
-            source = $(templates).filter('#dropdown_item').html();
-            template = Handlebars.compile(source);
-            for (var i = 0 ; i < json.length ; i++) {
-                dynamic_data = {
-                    item_url: _this.CONFIG.bulk_downloads_root + json[i][2],
-                    item_text: json[i][3].replace(/\_/g,' ')
-                };
-                s += template(dynamic_data);
-            }
-
-            /* Append items to the button. */
-            $('#item_list').append(s);
-
-        });
 
     };
 
