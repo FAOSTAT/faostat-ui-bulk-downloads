@@ -16,6 +16,7 @@ define(['jquery',
             lang_faostat: 'E',
             datasource: 'faostat',
             placeholder_id: 'placeholder',
+            url_rest: 'http://faostat3.fao.org/wds/rest',
             url_bulk_downloads: 'http://faostat3.fao.org/wds/rest',
             bulk_downloads_root: 'http://faostat.fao.org/Portals/_Faostat/Downloads/zip_files/',
             url_wds_crud: 'http://fenixapps2.fao.org/wds_5.1/rest/crud'
@@ -34,6 +35,12 @@ define(['jquery',
         /* Store FAOSTAT language. */
         this.CONFIG.lang_faostat = FAOSTATCommons.iso2faostat(this.CONFIG.lang);
 
+        /* Initiate the WDS client. */
+        this.CONFIG.w = new WDSClient({
+            datasource: this.CONFIG.datasource,
+            serviceUrl: this.CONFIG.url_wds_crud
+        });
+
     };
 
     BULK.prototype.create_flat_list = function() {
@@ -48,28 +55,42 @@ define(['jquery',
         });
 
         /* Fetch available bulk downloads. */
-        w.wdsclient('bulkdownloads', this.CONFIG, function(json) {
+        this.CONFIG.w.get_services_client({
 
-            /* Create flat list. */
-            var s = '';
-            var source = $(templates).filter('#dropdown_item').html();
-            var template = Handlebars.compile(source);
-            for (var i = 0 ; i < json.length ; i++) {
-                var name = json[i][3].replace(/\_/g,' ');
-                name = name.substring(0, name.indexOf('('));
-                var size = json[i][3].substring(1 + json[i][3].lastIndexOf('('), json[i][3].length - 1);
-                var dynamic_data = {
-                    item_url: _this.CONFIG.bulk_downloads_root + json[i][2],
-                    item_text: name,
-                    item_size: size
-                };
-                s += template(dynamic_data);
+            service_name: 'bulkdownloads',
+
+            parameters: {
+                datasource: this.CONFIG.datasource,
+                lang_faostat: this.CONFIG.lang_faostat,
+                domain: this.CONFIG.domain
+            },
+
+            wds_url: this.CONFIG.url_rest,
+
+            success: function (json) {
+
+                /* Create flat list. */
+                var s = '';
+                var source = $(templates).filter('#dropdown_item').html();
+                var template = Handlebars.compile(source);
+                for (var i = 0 ; i < json.length ; i++) {
+                    var name = json[i][3].replace(/\_/g,' ');
+                    name = name.substring(0, name.indexOf('('));
+                    var size = json[i][3].substring(1 + json[i][3].lastIndexOf('('), json[i][3].length - 1);
+                    var dynamic_data = {
+                        item_url: _this.CONFIG.bulk_downloads_root + json[i][2],
+                        item_text: name,
+                        item_size: size
+                    };
+                    s += template(dynamic_data);
+                }
+
+                /* Render the list. */
+                $('#' + _this.CONFIG.placeholder_id).html(s);
+
             }
 
-            /* Render the list. */
-            $('#' + _this.CONFIG.placeholder_id).html(s);
-
-        }, this.CONFIG.url_bulk_downloads);
+        });
 
     };
 
