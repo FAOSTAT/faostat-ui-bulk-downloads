@@ -16,10 +16,10 @@ define(['jquery',
             lang_faostat: 'E',
             datasource: 'faostat',
             placeholder_id: 'placeholder',
-            url_rest: 'http://faostat3.fao.org/wds/rest',
-            url_bulk_downloads: 'http://faostat3.fao.org/wds/rest',
+            url_rest: 'http://fenixapps2.fao.org/wds_5.2/rest',
+            url_bulk_downloads: 'http://fenixapps2.fao.org/wds_5.2/rest',
             bulk_downloads_root: 'http://faostat.fao.org/Portals/_Faostat/Downloads/zip_files/',
-            url_wds_crud: 'http://fenixapps2.fao.org/wds_5.1/rest/crud'
+            url_wds_crud: 'http://fenixapps2.fao.org/wds_5.2/rest/crud'
         };
 
     }
