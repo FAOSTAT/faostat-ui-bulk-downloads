@@ -46,7 +46,7 @@ define(['jquery',
     BULK.prototype.create_flat_list = function() {
 
         /* this... */
-        var _this = this;
+        var _this = this
 
         /* Initiate the WDS client. */
         var w = new WDSClient({
@@ -70,9 +70,9 @@ define(['jquery',
             success: function (json) {
 
                 /* Create flat list. */
-                var s = '';
-                var source = $(templates).filter('#dropdown_item').html();
-                var template = Handlebars.compile(source);
+                var s = '',
+                    source = $(templates).filter('#dropdown_item').html(),
+                    template = Handlebars.compile(source);
                 for (var i = 0 ; i < json.length ; i++) {
                     var name = json[i][3].replace(/\_/g,' ');
                     name = name.substring(0, name.indexOf('('));
@@ -86,7 +86,6 @@ define(['jquery',
                 }
 
                 /* Render the list. */
-                console.debug('#' + _this.CONFIG.placeholder_id);
                 $('#' + _this.CONFIG.placeholder_id).html(s);
 
             }
