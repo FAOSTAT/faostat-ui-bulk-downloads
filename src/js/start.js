@@ -86,6 +86,7 @@ define(['jquery',
                 }
 
                 /* Render the list. */
+                console.debug('#' + _this.CONFIG.placeholder_id);
                 $('#' + _this.CONFIG.placeholder_id).html(s);
 
             }
