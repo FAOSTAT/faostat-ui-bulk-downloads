@@ -1,3 +1,4 @@
+/*global define*/
 define(['jquery',
         'handlebars',
         'text!faostat_ui_bulk_downloads/html/templates.hbs',
@@ -24,13 +25,13 @@ define(['jquery',
 
     }
 
-    BULK.prototype.init = function(config) {
+    BULK.prototype.init = function (config) {
 
         /* Extend default configuration. */
         this.CONFIG = $.extend(true, {}, this.CONFIG, config);
 
         /* Fix the language, if needed. */
-        this.CONFIG.lang = this.CONFIG.lang != null ? this.CONFIG.lang : 'en';
+        this.CONFIG.lang = this.CONFIG.lang !== null ? this.CONFIG.lang : 'en';
 
         /* Store FAOSTAT language. */
         this.CONFIG.lang_faostat = FAOSTATCommons.iso2faostat(this.CONFIG.lang);
@@ -43,13 +44,17 @@ define(['jquery',
 
     };
 
-    BULK.prototype.create_flat_list = function() {
+    BULK.prototype.create_flat_list = function () {
 
         /* this... */
-        var _this = this
+        var that = this,
+            i,
+            name,
+            size,
+            dynamic_data;
 
         /* Initiate the WDS client. */
-        var w = new WDSClient({
+        this.CONFIG.w = new WDSClient({
             datasource: this.CONFIG.datasource,
             serviceUrl: this.CONFIG.url_wds_crud
         });
@@ -73,12 +78,12 @@ define(['jquery',
                 var s = '',
                     source = $(templates).filter('#dropdown_item').html(),
                     template = Handlebars.compile(source);
-                for (var i = 0 ; i < json.length ; i++) {
-                    var name = json[i][3].replace(/\_/g,' ');
+                for (i = 0; i < json.length; i += 1) {
+                    name = json[i][3].replace(/\_/g, ' ');
                     name = name.substring(0, name.indexOf('('));
-                    var size = json[i][3].substring(1 + json[i][3].lastIndexOf('('), json[i][3].length - 1);
-                    var dynamic_data = {
-                        item_url: _this.CONFIG.bulk_downloads_root + json[i][2],
+                    size = json[i][3].substring(1 + json[i][3].lastIndexOf('('), json[i][3].length - 1);
+                    dynamic_data = {
+                        item_url: that.CONFIG.bulk_downloads_root + json[i][2],
                         item_text: name,
                         item_size: size
                     };
@@ -86,7 +91,7 @@ define(['jquery',
                 }
 
                 /* Render the list. */
-                $('#' + _this.CONFIG.placeholder_id).html(s);
+                $('#' + that.CONFIG.placeholder_id).html(s);
 
             }
 
