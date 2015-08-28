@@ -4,8 +4,9 @@ define(['jquery',
         'text!faostat_ui_bulk_downloads/html/templates.hbs',
         'faostat_commons',
         'wds_client',
+        'i18n!faostat_ui_bulk_downloads/nls/translate',
         'bootstrap',
-        'sweetAlert'], function ($, Handlebars, templates, FAOSTATCommons, WDSClient) {
+        'sweetAlert'], function ($, Handlebars, templates, FAOSTATCommons, WDSClient, translate) {
 
     'use strict';
 
@@ -74,24 +75,34 @@ define(['jquery',
 
             success: function (json) {
 
-                /* Create flat list. */
-                var s = '',
-                    source = $(templates).filter('#dropdown_item').html(),
-                    template = Handlebars.compile(source);
-                for (i = 0; i < json.length; i += 1) {
-                    name = json[i][3].replace(/\_/g, ' ');
-                    name = name.substring(0, name.indexOf('('));
-                    size = json[i][3].substring(1 + json[i][3].lastIndexOf('('), json[i][3].length - 1);
-                    dynamic_data = {
-                        item_url: that.CONFIG.bulk_downloads_root + json[i][2],
-                        item_text: name,
-                        item_size: size
-                    };
-                    s += template(dynamic_data);
-                }
+                /* Courtesy message when no bulk download is available. */
+                if (json.length === 0) {
 
-                /* Render the list. */
-                $('#' + that.CONFIG.placeholder_id).html(s);
+                    /* Render the list. */
+                    $('#' + that.CONFIG.placeholder_id).html('<h1 class="text-center">' + translate.courtesy + '</h1>');
+
+                } else {
+
+                    /* Create flat list. */
+                    var s = '',
+                        source = $(templates).filter('#dropdown_item').html(),
+                        template = Handlebars.compile(source);
+                    for (i = 0; i < json.length; i += 1) {
+                        name = json[i][3].replace(/\_/g, ' ');
+                        name = name.substring(0, name.indexOf('('));
+                        size = json[i][3].substring(1 + json[i][3].lastIndexOf('('), json[i][3].length - 1);
+                        dynamic_data = {
+                            item_url: that.CONFIG.bulk_downloads_root + json[i][2],
+                            item_text: name,
+                            item_size: size
+                        };
+                        s += template(dynamic_data);
+                    }
+
+                    /* Render the list. */
+                    $('#' + that.CONFIG.placeholder_id).html(s);
+
+                }
 
             }
 
