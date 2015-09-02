@@ -64,10 +64,10 @@ define(['jquery',
             dynamic_data;
 
         /* Initiate the WDS client. */
-        this.CONFIG.w = new WDSClient({
-            datasource: this.CONFIG.datasource,
-            serviceUrl: this.CONFIG.url_wds_crud
-        });
+        //this.CONFIG.w = new WDSClient({
+        //    datasource: this.CONFIG.datasource,
+        //    serviceUrl: this.CONFIG.url_wds_crud
+        //});
 
         /* Fetch available bulk downloads. */
         this.CONFIG.w.get_services_client({
@@ -100,6 +100,9 @@ define(['jquery',
                         name = json[i][3].replace(/\_/g, ' ');
                         name = name.substring(0, name.indexOf('('));
                         size = json[i][3].substring(1 + json[i][3].lastIndexOf('('), json[i][3].length - 1);
+                        if (json[i][3].indexOf('(Norm)') > -1) {
+                            name += ' (Norm)';
+                        }
                         dynamic_data = {
                             item_url: that.CONFIG.bulk_downloads_root + json[i][2],
                             item_text: name,
