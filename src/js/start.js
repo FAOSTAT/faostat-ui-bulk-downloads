@@ -63,12 +63,6 @@ define(['jquery',
             size,
             dynamic_data;
 
-        /* Initiate the WDS client. */
-        //this.CONFIG.w = new WDSClient({
-        //    datasource: this.CONFIG.datasource,
-        //    serviceUrl: this.CONFIG.url_wds_crud
-        //});
-
         /* Fetch available bulk downloads. */
         this.CONFIG.w.get_services_client({
 
@@ -122,6 +116,10 @@ define(['jquery',
             }
 
         });
+
+    };
+
+    BULK.prototype.dispose = function () {
 
     };
 
