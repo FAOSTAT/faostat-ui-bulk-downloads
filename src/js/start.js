@@ -1,12 +1,13 @@
 /*global define*/
 define(['jquery',
         'handlebars',
+        'config/Config',
         'text!faostat_ui_bulk_downloads/html/templates.hbs',
         'faostat_commons',
-        'wds_client',
+        'faostatapiclient',
         'i18n!faostat_ui_bulk_downloads/nls/translate',
         'bootstrap',
-        'sweetAlert'], function ($, Handlebars, templates, FAOSTATCommons, WDSClient, translate) {
+        'sweetAlert'], function ($, Handlebars, Config, templates, FAOSTATCommons, FAOSTATAPIClient, translate) {
 
     'use strict';
 
@@ -38,11 +39,8 @@ define(['jquery',
         /* Store FAOSTAT language. */
         this.CONFIG.lang_faostat = FAOSTATCommons.iso2faostat(this.CONFIG.lang);
 
-        /* Initiate the WDS client. */
-        this.CONFIG.w = new WDSClient({
-            datasource: this.CONFIG.datasource,
-            serviceUrl: this.CONFIG.url_wds_crud
-        });
+        /* Initiate FAOSTAT API's client. */
+        this.CONFIG.api = new FAOSTATAPIClient();
 
     };
 
@@ -64,54 +62,44 @@ define(['jquery',
             dynamic_data;
 
         /* Fetch available bulk downloads. */
-        this.CONFIG.w.get_services_client({
+        this.CONFIG.api.bulkdownloads({
+            datasource: Config.DATASOURCE,
+            lang: this.CONFIG.lang,
+            domain_code: this.CONFIG.domain
+        }).then(function (json) {
 
-            service_name: 'bulkdownloads',
+            /* Courtesy message when no bulk download is available. */
+            if (json.length === 0) {
 
-            parameters: {
-                datasource: this.CONFIG.datasource,
-                lang_faostat: this.CONFIG.lang_faostat,
-                domain: this.CONFIG.domain
-            },
+                /* Render the list. */
+                $('#' + that.CONFIG.placeholder_id).html('<h1 class="text-center">' + translate.courtesy + '</h1>');
 
-            wds_url: this.CONFIG.url_rest,
+            } else {
 
-            success: function (json) {
-
-                /* Courtesy message when no bulk download is available. */
-                if (json.length === 0) {
-
-                    /* Render the list. */
-                    $('#' + that.CONFIG.placeholder_id).html('<h1 class="text-center">' + translate.courtesy + '</h1>');
-
-                } else {
-
-                    /* Create flat list. */
-                    var s = '',
-                        source = $(templates).filter('#dropdown_item').html(),
-                        template = Handlebars.compile(source);
-                    for (i = 0; i < json.length; i += 1) {
-                        name = json[i][3].replace(/\_/g, ' ');
-                        name = name.substring(0, name.indexOf('('));
-                        size = json[i][3].substring(1 + json[i][3].lastIndexOf('('), json[i][3].length - 1);
-                        if (json[i][3].indexOf('(Norm)') > -1) {
-                            name += ' (Norm)';
-                        }
-                        dynamic_data = {
-                            item_url: that.CONFIG.bulk_downloads_root + json[i][2],
-                            item_text: name,
-                            item_size: size
-                        };
-                        s += template(dynamic_data);
+                /* Create flat list. */
+                var s = '',
+                    source = $(templates).filter('#dropdown_item').html(),
+                    template = Handlebars.compile(source);
+                for (i = 0; i < json.data.length; i += 1) {
+                    name = json.data[i].content.replace(/\_/g, ' ');
+                    name = name.substring(0, name.indexOf('('));
+                    size = json.data[i].content.substring(1 + json.data[i].content.lastIndexOf('('), json.data[i].content.length - 1);
+                    if (json.data[i].content.indexOf('(Norm)') > -1) {
+                        name += ' (Norm)';
                     }
-
-                    /* Render the list. */
-                    $('#' + that.CONFIG.placeholder_id).html(s);
-
-                    /* Rendered. */
-                    that.CONFIG.rendered = true;
-
+                    dynamic_data = {
+                        item_url: that.CONFIG.bulk_downloads_root + json.data[i].filename,
+                        item_text: name,
+                        item_size: size
+                    };
+                    s += template(dynamic_data);
                 }
+
+                /* Render the list. */
+                $('#' + that.CONFIG.placeholder_id).html(s);
+
+                /* Rendered. */
+                that.CONFIG.rendered = true;
 
             }
 
