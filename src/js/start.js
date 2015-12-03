@@ -81,14 +81,14 @@ define(['jquery',
                     source = $(templates).filter('#dropdown_item').html(),
                     template = Handlebars.compile(source);
                 for (i = 0; i < json.data.length; i += 1) {
-                    name = json.data[i].content.replace(/\_/g, ' ');
+                    name = json.data[i].FileContent.replace(/\_/g, ' ');
                     name = name.substring(0, name.indexOf('('));
-                    size = json.data[i].content.substring(1 + json.data[i].content.lastIndexOf('('), json.data[i].content.length - 1);
-                    if (json.data[i].content.indexOf('(Norm)') > -1) {
+                    size = json.data[i].FileContent.substring(1 + json.data[i].FileContent.lastIndexOf('('), json.data[i].FileContent.length - 1);
+                    if (json.data[i].FileContent.indexOf('(Norm)') > -1) {
                         name += ' (Norm)';
                     }
                     dynamic_data = {
-                        item_url: that.CONFIG.bulk_downloads_root + json.data[i].filename,
+                        item_url: that.CONFIG.bulk_downloads_root + json.data[i].FileName,
                         item_text: name,
                         item_size: size
                     };
