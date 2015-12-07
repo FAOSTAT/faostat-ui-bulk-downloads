@@ -2,12 +2,12 @@
 define(['jquery',
         'handlebars',
         'config/Config',
+        'globals/Common',
         'text!faostat_ui_bulk_downloads/html/templates.hbs',
-        'faostat_commons',
         'faostatapiclient',
         'i18n!faostat_ui_bulk_downloads/nls/translate',
         'bootstrap',
-        'sweetAlert'], function ($, Handlebars, Config, templates, FAOSTATCommons, FAOSTATAPIClient, translate) {
+        'sweetAlert'], function ($, Handlebars, Config, Common, templates, FAOSTATAPIClient, translate) {
 
     'use strict';
 
@@ -36,9 +36,6 @@ define(['jquery',
         /* Fix the language, if needed. */
         this.CONFIG.lang = this.CONFIG.lang !== null ? this.CONFIG.lang : 'en';
 
-        /* Store FAOSTAT language. */
-        this.CONFIG.lang_faostat = FAOSTATCommons.iso2faostat(this.CONFIG.lang);
-
         /* Initiate FAOSTAT API's client. */
         this.CONFIG.api = new FAOSTATAPIClient();
 
@@ -64,7 +61,7 @@ define(['jquery',
         /* Fetch available bulk downloads. */
         this.CONFIG.api.bulkdownloads({
             datasource: Config.DATASOURCE,
-            lang: this.CONFIG.lang,
+            lang: Common.getLocale(),
             domain_code: this.CONFIG.domain
         }).then(function (json) {
 
