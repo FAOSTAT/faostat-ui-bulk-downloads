@@ -68,8 +68,7 @@ define(['jquery',
             i,
             name,
             size,
-            sizeUnit = 'MB',
-            dynamic_data;
+            sizeUnit = 'MB';
 
         /* Fetch available bulk downloads. */
         this.CONFIG.api.bulkdownloads({
