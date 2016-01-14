@@ -1,28 +1,29 @@
 /*global define*/
 define(['jquery',
+        'loglevel',
         'handlebars',
-        'config/Config',
-        'globals/Common',
+        'faostat-ui/config/Config',
+        'faostat-ui/globals/Common',
         'text!faostat_ui_bulk_downloads/html/templates.hbs',
         'faostatapiclient',
         'i18n!faostat_ui_bulk_downloads/nls/translate',
-        'bootstrap',
-        'sweetAlert'], function ($, Handlebars, Config, Common, templates, FAOSTATAPIClient, translate) {
+        'faostat-ui/lib/download/go_to_section/go-to-section'
+        ], function ($, log, Handlebars, Config, Common, templates, FAOSTATAPIClient, translate, GoToSection) {
 
     'use strict';
 
     function BULK() {
 
+        this.s = {
+
+            BULK_DOWNLOADS: '#bulk-download-items',
+            GO_TO_SECTION: '#go-to-section'
+
+        };
+
         this.CONFIG = {
-            lang: 'E',
-            domain: null,
-            lang_faostat: 'E',
-            datasource: 'faostat',
             placeholder_id: 'placeholder',
-            url_rest: 'http://fenixapps2.fao.org/wds_5.2/rest',
-            url_bulk_downloads: 'http://fenixapps2.fao.org/wds_5.2/rest',
             bulk_downloads_root: 'http://faostat.fao.org/Portals/_Faostat/Downloads/zip_files/',
-            url_wds_crud: 'http://fenixapps2.fao.org/wds_5.2/rest/crud',
             rendered: false
         };
 
@@ -34,10 +35,19 @@ define(['jquery',
         this.CONFIG = $.extend(true, {}, this.CONFIG, config);
 
         /* Fix the language, if needed. */
-        this.CONFIG.lang = this.CONFIG.lang !== null ? this.CONFIG.lang : 'en';
+        //this.CONFIG.lang = this.CONFIG.lang !== null ? this.CONFIG.lang : 'en';
 
         /* Initiate FAOSTAT API's client. */
         this.CONFIG.api = new FAOSTATAPIClient();
+
+        /* Container */
+        this.$CONTAINER = $('#' + this.CONFIG.placeholder_id);
+
+        /* init variables */
+        this.$CONTAINER.html($(templates).filter('#template').html());
+
+        this.$BULK_DOWNLOADS = this.$CONTAINER.find(this.s.BULK_DOWNLOADS);
+        this.$GO_TO_SECTION = this.$CONTAINER.find(this.s.GO_TO_SECTION);
 
     };
 
@@ -50,6 +60,8 @@ define(['jquery',
     };
 
     BULK.prototype.create_flat_list = function () {
+
+        log.info(this.CONFIG.placeholder_id)
 
         /* this... */
         var that = this,
@@ -65,40 +77,42 @@ define(['jquery',
             domain_code: this.CONFIG.domain
         }).then(function (json) {
 
-            /* Courtesy message when no bulk download is available. */
-            if (json.length === 0) {
+            /* prepare json */
+            var bulk_downloads_list = [],
+                source = $(templates).filter('#dropdown_items').html(),
+                t = Handlebars.compile(source);
 
-                /* Render the list. */
-                $('#' + that.CONFIG.placeholder_id).html('<h1 class="text-center">' + translate.courtesy + '</h1>');
-
-            } else {
-
-                /* Create flat list. */
-                var s = '',
-                    source = $(templates).filter('#dropdown_item').html(),
-                    template = Handlebars.compile(source);
-                for (i = 0; i < json.data.length; i += 1) {
-                    name = json.data[i].FileContent.replace(/\_/g, ' ');
-                    name = name.substring(0, name.indexOf('('));
-                    size = json.data[i].FileContent.substring(1 + json.data[i].FileContent.lastIndexOf('('), json.data[i].FileContent.length - 1);
-                    if (json.data[i].FileContent.indexOf('(Norm)') > -1) {
-                        name += ' (Norm)';
-                    }
-                    dynamic_data = {
-                        item_url: that.CONFIG.bulk_downloads_root + json.data[i].FileName,
-                        item_text: name,
-                        item_size: size
-                    };
-                    s += template(dynamic_data);
+            for (i = 0; i < json.data.length; i += 1) {
+                name = json.data[i].FileContent.replace(/\_/g, ' ');
+                name = name.substring(0, name.indexOf('('));
+                size = json.data[i].FileContent.substring(1 + json.data[i].FileContent.lastIndexOf('('), json.data[i].FileContent.length - 1);
+                if (json.data[i].FileContent.indexOf('(Norm)') > -1) {
+                    name += ' (Norm)';
                 }
 
-                /* Render the list. */
-                $('#' + that.CONFIG.placeholder_id).html(s);
-
-                /* Rendered. */
-                that.CONFIG.rendered = true;
-
+                bulk_downloads_list.push( {
+                    item_url: that.CONFIG.bulk_downloads_root + json.data[i].FileName,
+                    item_text: name,
+                    item_size: size
+                });
             }
+
+            log.info(bulk_downloads_list)
+
+            if (bulk_downloads_list.length <= 0) {
+                bulk_downloads_list = null;
+            }
+
+            that.$BULK_DOWNLOADS.html(t({
+                bulk_downloads_list: bulk_downloads_list,
+                no_bulk_downlaod_available: translate.no_bulk_downlaod_available,
+                bulk_downloads: translate.bulk_downloads
+            }));
+
+            new GoToSection().init({
+                container: that.$GO_TO_SECTION,
+                domain_code: that.CONFIG.domain
+            });
 
         });
 
