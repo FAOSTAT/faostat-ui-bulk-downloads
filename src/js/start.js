@@ -68,6 +68,7 @@ define(['jquery',
             i,
             name,
             size,
+            sizeUnit = 'MB',
             dynamic_data;
 
         /* Fetch available bulk downloads. */
@@ -90,10 +91,14 @@ define(['jquery',
                     name += ' (Norm)';
                 }
 
+                // TODO: add a check
+                // conversion from KB to MB
+                size = (parseFloat(size.substring(0, size.indexOf(' ')).replace(',', '').replace('.', '')) * 0.001).toFixed(2);
+
                 bulk_downloads_list.push( {
                     item_url: that.CONFIG.bulk_downloads_root + json.data[i].FileName,
                     item_text: name,
-                    item_size: size
+                    item_size: size + ' ' + sizeUnit
                 });
             }
 
