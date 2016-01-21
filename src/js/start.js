@@ -2,12 +2,12 @@
 define(['jquery',
         'loglevel',
         'handlebars',
-        'faostat-ui/config/Config',
-        'faostat-ui/globals/Common',
+        'config/Config',
+        'globals/Common',
         'text!faostat_ui_bulk_downloads/html/templates.hbs',
         'faostatapiclient',
         'i18n!faostat_ui_bulk_downloads/nls/translate',
-        'faostat-ui/lib/download/go_to_section/go-to-section'
+        'lib/download/go_to_section/go-to-section'
         ], function ($, log, Handlebars, Config, Common, templates, FAOSTATAPIClient, translate, GoToSection) {
 
     'use strict';
