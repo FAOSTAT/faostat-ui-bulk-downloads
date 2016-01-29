@@ -8,60 +8,54 @@ define(['jquery',
         'faostatapiclient',
         'i18n!faostat_ui_bulk_downloads/nls/translate',
         'lib/download/go_to_section/go-to-section'
-        ], function ($, log, Handlebars, Config, Common, templates, FAOSTATAPIClient, translate, GoToSection) {
+        ], function ($, log, Handlebars, C, Common, templates, FAOSTATAPIClient, translate, GoToSection) {
 
     'use strict';
 
+    var s = {
+
+        BULK_DOWNLOADS: '#bulk-download-items',
+        GO_TO_SECTION: '#go-to-section'
+
+    }, defaultOptions = {
+
+        bulk_downloads_root: C.URL_BULK_DOWNLOADS_BASEPATH
+
+    };
+
     function BULK() {
 
-        this.s = {
-
-            BULK_DOWNLOADS: '#bulk-download-items',
-            GO_TO_SECTION: '#go-to-section'
-
-        };
-
-        this.CONFIG = {
-            placeholder_id: 'placeholder',
-            bulk_downloads_root: 'http://faostat.fao.org/Portals/_Faostat/Downloads/zip_files/',
-            rendered: false
-        };
+        log.info('Bulk');
 
     }
 
     BULK.prototype.init = function (config) {
 
-        /* Extend default configuration. */
-        this.CONFIG = $.extend(true, {}, this.CONFIG, config);
+        this.o = $.extend(true, {}, defaultOptions, config);
 
-        /* Fix the language, if needed. */
-        //this.CONFIG.lang = this.CONFIG.lang !== null ? this.CONFIG.lang : 'en';
+        log.info(this.o);
 
         /* Initiate FAOSTAT API's client. */
-        this.CONFIG.api = new FAOSTATAPIClient();
+        this.api = new FAOSTATAPIClient();
 
         /* Container */
-        this.$CONTAINER = $('#' + this.CONFIG.placeholder_id);
+        this.$CONTAINER = $(this.o.container);
+        this.$CONTAINER.html('daje');
 
+        log.info(this.o.container)
         /* init variables */
         this.$CONTAINER.html($(templates).filter('#template').html());
 
-        this.$BULK_DOWNLOADS = this.$CONTAINER.find(this.s.BULK_DOWNLOADS);
-        this.$GO_TO_SECTION = this.$CONTAINER.find(this.s.GO_TO_SECTION);
+        this.$BULK_DOWNLOADS = this.$CONTAINER.find(s.BULK_DOWNLOADS);
+        this.$GO_TO_SECTION = this.$CONTAINER.find(s.GO_TO_SECTION);
+
+        this.createBulkDownloadList();
 
     };
 
-    BULK.prototype.isRendered = function () {
-        return this.CONFIG.rendered;
-    };
+    BULK.prototype.createBulkDownloadList = function () {
 
-    BULK.prototype.isNotRendered = function () {
-        return !this.CONFIG.rendered;
-    };
-
-    BULK.prototype.create_flat_list = function () {
-
-        log.info(this.CONFIG.placeholder_id)
+        log.info('BULk; this.$CONTAINER', this.$CONTAINER.length);
 
         /* this... */
         var that = this,
@@ -71,10 +65,10 @@ define(['jquery',
             sizeUnit = 'MB';
 
         /* Fetch available bulk downloads. */
-        this.CONFIG.api.bulkdownloads({
-            datasource: Config.DATASOURCE,
+        this.api.bulkdownloads({
+            datasource: C.DATASOURCE,
             lang: Common.getLocale(),
-            domain_code: this.CONFIG.domain
+            domain_code: this.o.code
         }).then(function (json) {
 
             /* prepare json */
@@ -95,13 +89,13 @@ define(['jquery',
                 size = (parseFloat(size.substring(0, size.indexOf(' ')).replace(',', '').replace('.', '')) * 0.001).toFixed(2);
 
                 bulk_downloads_list.push( {
-                    item_url: that.CONFIG.bulk_downloads_root + json.data[i].FileName,
+                    item_url: that.o.bulk_downloads_root + json.data[i].FileName,
                     item_text: name,
                     item_size: size + ' ' + sizeUnit
                 });
             }
 
-            log.info(bulk_downloads_list)
+            log.info('BULk; bulk_downloads_list', bulk_downloads_list);
 
             if (bulk_downloads_list.length <= 0) {
                 bulk_downloads_list = null;
@@ -115,7 +109,7 @@ define(['jquery',
 
             new GoToSection().init({
                 container: that.$GO_TO_SECTION,
-                domain_code: that.CONFIG.domain
+                domain_code: that.o.code
             });
 
         });
@@ -123,6 +117,8 @@ define(['jquery',
     };
 
     BULK.prototype.dispose = function () {
+
+        this.$CONTAINER.empty();
 
     };
 
