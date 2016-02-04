@@ -22,9 +22,9 @@
 
 <script type='text/x-handlebars-template' id='dropdown_items'>
 
-
     <div class='row'>
         <div class='col-xs-12'>
+            <p>{{bulk_downloads_welcome}}</p>
             <h3>{{bulk_downloads}}</h3>
         </div>
     </div>
@@ -34,10 +34,13 @@
             {{#if bulk_downloads_list}}
                 <ul style="list-style-type: none; padding: 0; margin: 0;">
                     {{#each bulk_downloads_list}}
-                        <li style="padding-top: 10px;">
-                            <a  target='_blank' class="bulk-list" href='{{item_url}}'>
-                                <i class='fa fa-archive'></i> {{item_text}} <span class='badge' style='float: right;'>{{item_size}}</span>
-                            </a>
+                        <li style="padding-top: 2px;">
+                            <h5>
+                                <a  target='_blank' class="bulk-list" href='{{item_url}}'>
+                                    <i class="fa fa-file-archive-o"></i>&nbsp;{{item_text}}
+                                </a>
+                                <span class='badge pull-right'>{{item_size}}</span>
+                            </h5>
                         </li>
                     {{/each}}
                 </ul>

@@ -104,7 +104,8 @@ define(['jquery',
             that.$BULK_DOWNLOADS.html(t({
                 bulk_downloads_list: bulk_downloads_list,
                 no_bulk_downlaod_available: translate.no_bulk_downlaod_available,
-                bulk_downloads: translate.bulk_downloads
+                bulk_downloads: translate.bulk_downloads,
+                bulk_downloads_welcome: translate.bulk_downloads_welcome
             }));
 
             new GoToSection().init({
