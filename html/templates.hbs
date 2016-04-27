@@ -2,8 +2,8 @@
 
 
     <div id="bulk-download-items"></div>
-    <br>
-    <div id="go-to-section"></div>
+    <!--<br>-->
+    <!--<div id="go-to-section"></div>-->
 
 </script>
 
@@ -24,6 +24,7 @@
 
 <script type='text/x-handlebars-template' id='dropdown_items'>
 
+    {{#if show_header}}
     <div class='row'>
         <div class='col-xs-12'>
             <br>
@@ -31,6 +32,7 @@
             <h3>{{bulk_downloads}}</h3>
         </div>
     </div>
+    {{/if}}
 
     <div class='row'>
         <div class='col-xs-12'>

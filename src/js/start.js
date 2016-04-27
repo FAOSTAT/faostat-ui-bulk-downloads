@@ -6,9 +6,8 @@ define(['jquery',
         'globals/Common',
         'text!faostat_ui_bulk_downloads/html/templates.hbs',
         'faostatapiclient',
-        'i18n!faostat_ui_bulk_downloads/nls/translate',
-        'lib/download/go_to_section/go-to-section'
-        ], function ($, log, Handlebars, C, Common, templates, FAOSTATAPIClient, translate, GoToSection) {
+        'i18n!faostat_ui_bulk_downloads/nls/translate'
+        ], function ($, log, Handlebars, C, Common, templates, FAOSTATAPIClient, translate) {
 
     'use strict';
 
@@ -19,7 +18,9 @@ define(['jquery',
 
     }, defaultOptions = {
 
-        bulk_downloads_root: C.URL_BULK_DOWNLOADS_BASEPATH
+        bulk_downloads_root: C.URL_BULK_DOWNLOADS_BASEPATH,
+        show_header: true,
+        show_all_data_only: false
 
     };
 
@@ -33,7 +34,7 @@ define(['jquery',
 
         this.o = $.extend(true, {}, defaultOptions, config);
 
-        log.info(this.o);
+        log.info("BULK.init; options", this.o);
 
         /* Initiate FAOSTAT API's client. */
         this.api = new FAOSTATAPIClient();
@@ -42,12 +43,10 @@ define(['jquery',
         this.$CONTAINER = $(this.o.container);
         this.$CONTAINER.html('daje');
 
-        log.info(this.o.container)
         /* init variables */
         this.$CONTAINER.html($(templates).filter('#template').html());
 
         this.$BULK_DOWNLOADS = this.$CONTAINER.find(s.BULK_DOWNLOADS);
-        this.$GO_TO_SECTION = this.$CONTAINER.find(s.GO_TO_SECTION);
 
         this.createBulkDownloadList();
 
@@ -55,7 +54,7 @@ define(['jquery',
 
     BULK.prototype.createBulkDownloadList = function () {
 
-        log.info('BULk; this.$CONTAINER', this.$CONTAINER.length);
+        log.info('BULK.createBulkDownloadList;');
 
         /* this... */
         var that = this,
@@ -108,12 +107,15 @@ define(['jquery',
                 bulk_downloads_welcome: translate.bulk_downloads_welcome
             }));
 
-            new GoToSection().init({
-                container: that.$GO_TO_SECTION,
-                domain_code: that.o.code
-            });
-
         });
+
+    };
+
+    BULK.prototype._showList = function() {
+
+    };
+
+    BULK.prototype._showAllDataButton = function() {
 
     };
 
