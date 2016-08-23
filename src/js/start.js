@@ -7,7 +7,7 @@ define(['jquery',
         'text!faostat_ui_bulk_downloads/html/templates.hbs',
         'faostatapiclient',
         'i18n!faostat_ui_bulk_downloads/nls/translate'
-        ], function ($, log, Handlebars, C, Common, templates, FAOSTATAPIClient, translate) {
+        ], function ($, log, Handlebars, C, Common, templates, API, translate) {
 
     'use strict';
 
@@ -36,9 +36,6 @@ define(['jquery',
 
         log.info("BULK.init; options", this.o);
 
-        /* Initiate FAOSTAT API's client. */
-        this.api = new FAOSTATAPIClient();
-
         /* Container */
         this.$CONTAINER = $(this.o.container);
         this.$CONTAINER.html('daje');
@@ -64,9 +61,7 @@ define(['jquery',
             sizeUnit = 'MB';
 
         /* Fetch available bulk downloads. */
-        this.api.bulkdownloads({
-            datasource: C.DATASOURCE,
-            lang: Common.getLocale(),
+        API.bulkdownloads({
             domain_code: this.o.code
         }).then(function (json) {
 
